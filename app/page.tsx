@@ -1,6 +1,7 @@
-import { NodeSdkLive } from '@/infra/tracing/NodeSdkLive'
+import { fromEffect } from '@/lib/utils'
 import { Effect, flow } from 'effect'
 import type { Metadata } from 'next/types'
+import { ModeToggle } from './_components/mode-toggle'
 
 type Props = {
   params: {
@@ -16,10 +17,11 @@ function ContributorPageEffect({ params, searchParams }: Props) {
     return (
       <main className="overflow-hidden">
         <h1>Use Opentelemetry</h1>
+        <ModeToggle className="-my-2" />
       </main>
     )
   }).pipe(
-    Effect.withSpan(`Render page 4`, {
+    Effect.withSpan(`Render page 1`, {
       attributes: { slug: params.slug },
     })
   ) satisfies Effect.Effect<any, never, JSX.Element>
@@ -30,21 +32,13 @@ function generateMetadataEffect({ params, searchParams }: Props) {
     title: 'Test using Otel',
     description: 'Using Otel in next.js with Effect',
   }).pipe(
-    Effect.withSpan('Generate metadata for page 4', {
+    Effect.withSpan('Generate metadata for page 11', {
       attributes: { slug: params.slug },
     })
   ) satisfies Effect.Effect<any, never, Metadata>
 }
 
-const ContributorPage = flow(
-  ContributorPageEffect,
-  Effect.provide(NodeSdkLive),
-  Effect.runPromise
-)
+const ContributorPage = fromEffect(ContributorPageEffect)
 export default ContributorPage
 
-export const generateMetadata = flow(
-  generateMetadataEffect,
-  Effect.provide(NodeSdkLive),
-  Effect.runPromise
-)
+export const generateMetadata = fromEffect(generateMetadataEffect)
